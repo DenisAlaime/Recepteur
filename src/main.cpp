@@ -9,6 +9,7 @@
 #include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
 #include <FireTimer.h>
+// ajoute d'une ligne pour test
 
 /*
 #define RF_CS 0  // Pin 0 de l'arduino
