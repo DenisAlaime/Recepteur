@@ -9,12 +9,17 @@
 #include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
 #include <FireTimer.h>
-// ajoute d'une ligne pour test
+// ajout d'une ligne pour test
+// ajout d'une deuxième ligne
+
 
 /*
 #define RF_CS 0  // Pin 0 de l'arduino
 #define RF_RST 16 // Pin 21 de l'arduino //CE
 */
+//sdfsdf
+//sfsfdsf
+
 // #ifdef ARDUINO_AVR_MEGA2560
 // #define RF_CS 7
 // #define RF_RST 6
@@ -38,7 +43,7 @@ void printDetail(uint8_t type, int value);
 // #define RF_CS 0
 // #define RF_RST 16
 
-// // #elif ARDUINO_AVR_NANO
+ // #elif ARDUINO_AVR_NANO
 // // #define RF_CS 7  // CS de l'émetteur à la pin GPA4 sur le MCP23017 (CSN)
 // // #define RF_RST 6 // RST de l'émetteur à la pin GPA5 sur le MCP23017 (CE)
 
