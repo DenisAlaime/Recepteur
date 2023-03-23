@@ -69,9 +69,9 @@ uint8_t servonum = 0;//**** Servo-Levage connecté à la PIN LED0 soit n°0 (il 
 
 
 //moteur
-const unsigned int IN1=2;
-const unsigned int IN2=20;
-const unsigned int EnA=10;
+#define IN1 2
+#define IN2 20
+#define EnA 10
 L298N motor(EnA, IN1, IN2);
  
 
@@ -80,21 +80,21 @@ L298N motor(EnA, IN1, IN2);
 //float ValeurJoyStk1VertAnalogRecue=0.0;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Nouveau!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 struct PackageData{
-    int JoyGaucheX;
-    int JoyGaucheY;
-    int JoyDroitX;
-    int JoyDroitY;
-    bool LEDcabAv;
-    bool LEDcabArr;
-    bool Warning;
-    bool FrontLight;
-    bool ClignoDroite;
-    bool ClignoGauche;
-    bool Klaxon;
-    byte JoyGauche;
-    byte LEDcab;
+    int JoyStk1HorValue=513;
+    int JoyStk1VertValue=513;
+    int JoyStk2HorValue=513;
+    int JoyStk2VertValue=513;
+    bool LEDcabAv=0;
+    bool LEDcabArr=0;
+    bool Warning=0;
+    bool ClignoDroite=0;
+    bool ClignoGauche=0;
+    bool FrontLight=0;
+    bool Klaxon=0;
+    byte JoyGauche=0;
+    byte LEDcab=0;
 };
-PackageData DataToSend;
+PackageData DataToReceive;
 float value;
 float valuePWM;
 
@@ -107,6 +107,7 @@ void setup()
   Serial.println("Récepteur NRF24");
   Serial.println("");
   pinMode(13, OUTPUT);
+  //pinMode(5,INPUT_PULLDOWN);
   digitalWrite(13, LOW);
 
   pinMode(LEDcabineAv,OUTPUT);
@@ -174,6 +175,8 @@ Serial.println("138");
   delay(2000);
 }
 
+
+
 void loop()
 {
   /************************************************************
@@ -188,33 +191,33 @@ void loop()
       // Serial.println("Récepteur ");
     
     //radio.read(&ValeurJoyStk1VertAnalogRecue, sizeof(ValeurJoyStk1VertAnalogRecue)); 
-    radio.read(&DataToSend,sizeof(DataToSend)); //lire la totalisté des données reçues 
+    radio.read(&DataToReceive,sizeof(DataToReceive)); //lire la totalisté des données reçues 
     //Serial.print("Message reçu : "); 
     //Serial.println(message);     // … et on l'affiche sur le port série !
     // … toutes les secondes !
-    //Serial.println(DataToSend);
+    //Serial.println(DataToReceive);
     
     digitalWrite(13,!(digitalRead(13)));
     // Serial.print("Déplacement x: ");
-    // Serial.println(DataToSend.JoyGaucheX);
+    // Serial.println(DataToReceive.JoyStk1HorValue);
     Serial.print("Déplacement y: ");
-    Serial.println(DataToSend.JoyGaucheY);
+    Serial.println(DataToReceive.JoyStk1VertValue);
 
     //horlogique=marche avant (à vérifier tout de meme )
     //se baser sur la valeur y reçue 
-    if (DataToSend.JoyGaucheY >= 580){
+    if (DataToReceive.JoyStk1VertValue >= 580){
       
-      value = map(DataToSend.JoyGaucheY, 530, 1023, 0, 255);
+      value = map(DataToReceive.JoyStk1VertValue, 530, 1023, 0, 255);
       motor.setSpeed(value);
       motor.forward();
       Serial.println("av");
       // //valeurs de 530 à 1023
-      // if ((DataToSend.JoyGaucheY < 860)&&(DataToSend.JoyGaucheY > 694)){
+      // if ((DataToReceive.JoyStk1VertValue < 860)&&(DataToReceive.JoyStk1VertValue > 694)){
       //   //motor.setSpeed(90);
 
       //   Serial.println("v2 av");
       // }else 
-      // if (DataToSend.JoyGaucheY >= 860){
+      // if (DataToReceive.JoyStk1VertValue >= 860){
       //   motor.setSpeed(140);
       //   Serial.println("v3 av");
       // }else{
@@ -222,13 +225,13 @@ void loop()
       //   Serial.println("v1 av");
       // }
     }else
-    if (DataToSend.JoyGaucheY <= 430){
+    if (DataToReceive.JoyStk1VertValue <= 430){
       
-      value = map(DataToSend.JoyGaucheY, 480, 0, 0, 255);
+      value = map(DataToReceive.JoyStk1VertValue, 480, 0, 0, 255);
       motor.setSpeed(value);
       motor.backward();
       Serial.println("arr");
-      // if ((DataToSend.JoyGaucheY >160)&&(DataToSend.JoyGaucheY <= 320)){
+      // if ((DataToSend.JoyStk1VertValue >160)&&(DataToSend.JoyStk1VertValue <= 320)){
       //   motor.setSpeed(90);
       //   Serial.println("v2 arr");
       // }else 
@@ -246,9 +249,9 @@ void loop()
       Serial.println("Stop ");
     }
   //Serial.println("pas bloque");
-  digitalWrite(LEDcabineAv,DataToSend.LEDcabAv);
+  digitalWrite(LEDcabineAv,DataToReceive.LEDcabAv);
   Serial.println("led");
-  digitalWrite(LEDcabineArr,DataToSend.LEDcabArr);
+  digitalWrite(LEDcabineArr,DataToReceive.LEDcabArr);
 
   //digitalWrite(LEDfrontLight,digitalRead(DataToSend.FrontLight));
 
@@ -278,14 +281,14 @@ void loop()
 
 
 
-if (DataToSend.JoyDroitY >= 580){
+if (DataToReceive.JoyStk2VertValue >= 580){
       Serial.println("PWM sens 2");
-      valuePWM = map(DataToSend.JoyDroitY, 530, 1023, 0, 180);
+      valuePWM = map(DataToReceive.JoyStk2VertValue, 530, 1023, 0, 180);
       pwm.setPWM(servonum,0,valuePWM);//***
     }else
-    if (DataToSend.JoyDroitY <= 430){
+    if (DataToReceive.JoyStk2VertValue <= 430){
       Serial.println("PWM sens 1");
-      valuePWM = map(DataToSend.JoyDroitY, 480, 0, 180, 0);
+      valuePWM = map(DataToReceive.JoyStk2VertValue, 480, 0, 180, 0);
       pwm.setPWM(servonum,0,valuePWM);//***
     }else
     {
@@ -293,7 +296,7 @@ if (DataToSend.JoyDroitY >= 580){
       pwm.setPWM(servonum,0,0);//***
     }
 
-  if (DataToSend.Klaxon==1){
+  if (DataToReceive.Klaxon==1){
     myDFPlayer.play(1); //tester et voir quel son est le klaxon
     //delay(1200);//essayé en M1 et son delay ca va trop vite
    // myDFPlayer.pause();
