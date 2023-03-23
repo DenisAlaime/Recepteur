@@ -211,19 +211,7 @@ void loop()
       motor.setSpeed(value);
       motor.forward();
       Serial.println("av");
-      // //valeurs de 530 à 1023
-      // if ((DataToReceive.JoyStk1VertValue < 860)&&(DataToReceive.JoyStk1VertValue > 694)){
-      //   //motor.setSpeed(90);
-
-      //   Serial.println("v2 av");
-      // }else 
-      // if (DataToReceive.JoyStk1VertValue >= 860){
-      //   motor.setSpeed(140);
-      //   Serial.println("v3 av");
-      // }else{
-      //   motor.setSpeed(50);
-      //   Serial.println("v1 av");
-      // }
+      
     }else
     if (DataToReceive.JoyStk1VertValue <= 430){
       
@@ -231,17 +219,6 @@ void loop()
       motor.setSpeed(value);
       motor.backward();
       Serial.println("arr");
-      // if ((DataToSend.JoyStk1VertValue >160)&&(DataToSend.JoyStk1VertValue <= 320)){
-      //   motor.setSpeed(90);
-      //   Serial.println("v2 arr");
-      // }else 
-      // if (DataToSend.JoyGaucheY <= 160){
-      //   motor.setSpeed(140);
-      //   Serial.println("v3 arr");
-      // }else{
-      //   motor.setSpeed(50);
-      //   Serial.println("v1 arr");
-      // } 
     }else
     {
      // motor.setSpeed(0);
