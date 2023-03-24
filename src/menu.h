@@ -24,7 +24,9 @@ typedef struct //PROGMEM
 
 // Menu state machine states
 #define ST_S1                             1
+#define ST_S2_ReceiveDataFunc                 2
 #define ST_S2_Bienvenu                    2
+
 #define ST_S3_SetSound                    3 //volume du bull
 
 // Menu text
@@ -34,7 +36,7 @@ const  char PROGMEM  MT_S2_Bienvenu[]                   = "Bienvenu:";
 
 const   MENU_NEXTSTATE menu_nextstate[]  = {
 //  STATE                       INPUT                   NEXT STATE
-    {ST_S1,                       KEY_SwJoyStk1,            ST_S2_Bienvenu},
+    {ST_S1,                       KEY_RadioDataAvailable,            ST_S2_ReceiveDataFunc},
     {ST_S1,                       SwJoyStk2,                ST_S3_SetSound},
 
 
@@ -46,7 +48,7 @@ const   MENU_NEXTSTATE menu_nextstate[]  = {
 //  STATE                               STATE TEXT                  STATE_FUNC
     
     {ST_S1,                             MT_S0Start,                   NULL}, //quand on entre dans le menu, on ne fait rien 
-    {ST_S2_Bienvenu,                   MT_S2_Bienvenu,           SetSound}, 
+    {ST_S2_ReceiveDataFunc,                 NULL,                   AnalyzeData}, 
     
     {0,                                 NULL,                       NULL},
 

@@ -29,7 +29,7 @@ char ViewPourcentage(char input);
 //char Arret(char input);
 
 //envoie vers le Bull
-
+char AnalyzeData(char input);
 char Klaxon(char input);
 char ClignoDroite(char input);
 char ClignoGauche(char input);

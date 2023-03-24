@@ -12,8 +12,9 @@
 //on peut mettre des nombres aléatoires mais on ne peut pas avoir 2 fois le meme =oui
 
 
-
+#define KEY_RadioDataAvailable 1
 #define KEY_SwJoyStk1 5 //bouton du joystick gauche
+
 
 
 
