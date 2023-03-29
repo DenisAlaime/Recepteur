@@ -87,6 +87,7 @@ char StatLED=0;
 
 #define servonum_0 0  //**** Servo-Levage connecté à la PIN LED0 soit n°0 (il faut mettre un nombre entre 0 et 15 et sur l'extender, on a LED0-LED15)
 #define servonum_1 1
+#define servonum_2 2
 
 //moteur
 #define IN1 2
@@ -309,8 +310,6 @@ void SetTransition (char _transition)
 
 void ReadKey(void)
 {
-    
-    
      if (radio.available()){
       SetTransition(KEY_RadioDataAvailable);
      }
@@ -361,6 +360,11 @@ void ReadKey(void)
 
    valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, 0, 180);
    pwm.setPWM(servonum_0,0,valuePWM);//***
+   valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, 0, 180);
+   pwm.setPWM(servonum_1,0,valuePWM);//***
+   valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, 0, 180);
+   pwm.setPWM(servonum_2,0,valuePWM);//***
+   
 
   
   // if (DataToReceive.JoyStk2VertValue >= 580){
