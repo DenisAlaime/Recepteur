@@ -47,7 +47,7 @@ const   MENU_NEXTSTATE menu_nextstate[]  = {
   const MENU_STATE menu_state[] PROGMEM    = {  
 //  STATE                               STATE TEXT                  STATE_FUNC
     
-    {ST_S1,                             MT_S0Start,                   NULL}, //quand on entre dans le menu, on ne fait rien 
+    {ST_S1,                             NULL,                   NULL}, //quand on entre dans le menu, on ne fait rien 
     {ST_S2_ReceiveDataFunc,                 NULL,                   AnalyzeData}, 
     
     {0,                                 NULL,                       NULL},

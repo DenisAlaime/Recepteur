@@ -27,7 +27,7 @@
 // #define RF_RST 6
 
 
-
+#define ENABLE_DEBUG_OUTPUT
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();//***
 
@@ -67,10 +67,10 @@ unsigned int global_counter=0;//permet de générer des tempo dans la routine d'
 // // #define RF_RST 6 // RST de l'émetteur à la pin GPA5 sur le MCP23017 (CE)
 
 //  #endif
-#define SERVOMIN  150 // This is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  600 // This is the 'maximum' pulse length count (out of 4096)
-#define USMIN  600 // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
-#define USMAX  2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
+#define SERVOMIN  80 // This is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  500 // This is the 'maximum' pulse length count (out of 4096)
+#define USMIN  900 // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
+#define USMAX  2100 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 #define tunnel "PIPE1"
@@ -119,6 +119,11 @@ float valuePWM;
 void setup()
 {
   
+  
+    state = ST_S1;
+    nextstate = ST_S1;
+    statetext = MT_S0Start;//NULL;//(menu_state[0].pText);//MT_TIME_CLOCK;//MT_HELLO;
+    pStateFunc = NULL;  
   //Je pense ces lignes inutiles pour le Bull
   // Initialisation du port série (pour afficher les infos reçues, sur le "Moniteur Série" de l'IDE Arduino)
   Serial.begin(9600);
@@ -221,7 +226,7 @@ void loop()
 
         //input = getkey();           // Read buttons
         input = GetTransition();
-        if (input != KEY_NULL) Serial.println(input);
+        if (input != KEY_NULL)// Serial.println(input);
 
         if (pStateFunc)  //Si une fonction est en court, le pointeur de foncion est différent de 0 et la fonction pointée par ce pointeur
                         //est appelée en boucle. 
@@ -233,7 +238,7 @@ void loop()
         {
             nextstate = StateMachine(state, input); // S'il n'y a pas de fonction en cours, le changement d'état est recalculé dans la "stateMachine" en fonction des touches activées.
             //Voir tableau "const   MENU_NEXTSTATE menu_nextstate[]" dans menu.h
-            Serial.println(nextstate);
+            //Serial.println(nextstate);
         }
 
         if (nextstate != state)
@@ -312,6 +317,11 @@ void ReadKey(void)
 {
      if (radio.available()){
       SetTransition(KEY_RadioDataAvailable);
+     // Serial.println("ReadKey");
+      // while (1)
+      //   {
+      //     /* code */
+      //   }
      }
 
     
@@ -327,7 +337,12 @@ void ReadKey(void)
     {
         enter = 0;        
         
-        Serial.println("ST_S2_ReceiveDataFunc");
+        //Serial.println("ST_S2_ReceiveDataFunc");
+        // while (1)
+        // {
+        //   /* code */
+        // }
+        
     } 
 
     radio.read(&DataToReceive,sizeof(DataToReceive)); //lire la totalisté des données reçues 
@@ -337,7 +352,7 @@ void ReadKey(void)
       value = map(DataToReceive.JoyStk1VertValue, 530, 1023, 0, 255);
       motor.setSpeed(value);
       motor.forward();
-      Serial.println("av");
+      //Serial.println("av");
       
     }else
     if (DataToReceive.JoyStk1VertValue <= 430){
@@ -345,25 +360,26 @@ void ReadKey(void)
       value = map(DataToReceive.JoyStk1VertValue, 480, 0, 0, 255);
       motor.setSpeed(value);
       motor.backward();
-      Serial.println("arr");
+      //Serial.println("arr");
     }else
     {
      // motor.setSpeed(0);
       motor.stop();
-      Serial.println("Stop ");
+      //Serial.println("Stop ");
     }
   //Serial.println("pas bloque");
    digitalWrite(LEDcabineAv,DataToReceive.LEDcabAv);
-   Serial.println("led");
+   //Serial.println("led");
    digitalWrite(LEDcabineArr,DataToReceive.LEDcabArr);
 
 
-   valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, 0, 180);
-   pwm.setPWM(servonum_0,0,valuePWM);//***
-   valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, 0, 180);
+   valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, USMIN, USMAX);
+   //pwm.writeMicroseconds(0,valuePWM);
+   //pwm.setPWM(servonum_0,0,valuePWM);//***
+   valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, SERVOMIN, SERVOMAX);
    pwm.setPWM(servonum_1,0,valuePWM);//***
    valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, 0, 180);
-   pwm.setPWM(servonum_2,0,valuePWM);//***
+   //pwm.setPWM(servonum_2,0,valuePWM);//***
    
 
   
