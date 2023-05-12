@@ -67,10 +67,10 @@ unsigned int global_counter=0;//permet de générer des tempo dans la routine d'
 // // #define RF_RST 6 // RST de l'émetteur à la pin GPA5 sur le MCP23017 (CE)
 
 //  #endif
-#define SERVOMIN  80 // This is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  500 // This is the 'maximum' pulse length count (out of 4096)
-#define USMIN  900 // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
-#define USMAX  2100 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
+#define SERVOMIN  150 // This is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  600 // This is the 'maximum' pulse length count (out of 4096)
+#define USMIN  600 // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
+#define USMAX  2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 #define tunnel "PIPE1"
@@ -376,10 +376,13 @@ void ReadKey(void)
    valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, USMIN, USMAX);
    //pwm.writeMicroseconds(0,valuePWM);
    //pwm.setPWM(servonum_0,0,valuePWM);//***
-   valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, SERVOMIN, SERVOMAX);
-   pwm.setPWM(servonum_1,0,valuePWM);//***
-   valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, 0, 180);
-   //pwm.setPWM(servonum_2,0,valuePWM);//***
+   //valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, SERVOMIN, SERVOMAX);
+   valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, USMIN, USMAX);
+   pwm.writeMicroseconds(servonum_0,valuePWM);//***
+   //valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, 0, 180);
+   pwm.writeMicroseconds(servonum_1,valuePWM);//***
+   Serial.println(DataToReceive.JoyStk1HorValue);
+   Serial.println(valuePWM);
    
 
   
