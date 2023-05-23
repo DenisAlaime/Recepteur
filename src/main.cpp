@@ -76,7 +76,7 @@ unsigned int global_counter=0;//permet de générer des tempo dans la routine d'
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 #define ESCOFF     1000
-#define ESCON       1400
+#define ESCON       1200
 
 #define tunnel "PIPE1"
 
