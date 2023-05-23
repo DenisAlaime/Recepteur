@@ -33,6 +33,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();//***
 
 SoftwareSerial mySoftwareSerial(21, 17); // RX, TX (j'ai mis les vraies PIN de l'arduino)
 DFRobotDFPlayerMini myDFPlayer;
+
 //void printDetail(uint8_t type, int value);
 
 unsigned char state;  // holds the current state, according to "menu.h"
@@ -56,6 +57,7 @@ unsigned int global_counter=0;//permet de générer des tempo dans la routine d'
 #define LEDgauche  6
 #define LEDdroite 7
 #define LEDfrontLight 8 
+
 // #ifdef
 // //#elif 
 // ARDUINO_AVR_NANO_EVERY
@@ -73,6 +75,9 @@ unsigned int global_counter=0;//permet de générer des tempo dans la routine d'
 #define USMAX  2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
+#define ESCOFF     1000
+#define ESCON       1400
+
 #define tunnel "PIPE1"
 
 RF24 radio(RF_RST, RF_CS); // Instanciation du NRF24L01
@@ -88,6 +93,9 @@ char StatLED=0;
 #define servonum_0 0  //**** Servo-Levage connecté à la PIN LED0 soit n°0 (il faut mettre un nombre entre 0 et 15 et sur l'extender, on a LED0-LED15)
 #define servonum_1 1
 #define servonum_2 2
+#define servonum_3 3
+#define servonum_4 4
+#define ESC 5
 
 //moteur
 #define IN1 2
@@ -111,10 +119,12 @@ struct PackageData{
     bool Klaxon=0;
     byte JoyGauche=0;
     byte LEDcab=0;
+    bool ESCpump=0;
 };
 PackageData DataToReceive;
 float value;
 float valuePWM;
+float valESC;
 
 void setup()
 {
@@ -332,6 +342,7 @@ void ReadKey(void)
 {
    static char enter = 1;
    uint16_t valuePWM;
+   //int valESC;
 
     if (enter)
     {
@@ -346,7 +357,7 @@ void ReadKey(void)
     } 
 
     radio.read(&DataToReceive,sizeof(DataToReceive)); //lire la totalisté des données reçues 
-
+//moteur dc
     if (DataToReceive.JoyStk1VertValue >= 580){
       
       value = map(DataToReceive.JoyStk1VertValue, 530, 1023, 0, 255);
@@ -367,13 +378,23 @@ void ReadKey(void)
       motor.stop();
       //Serial.println("Stop ");
     }
+    //fin moteur dc
+
   //Serial.println("pas bloque");
+
+  //Leds cabine
    digitalWrite(LEDcabineAv,DataToReceive.LEDcabAv);
    //Serial.println("led");
    digitalWrite(LEDcabineArr,DataToReceive.LEDcabArr);
+  // fin Leds cabine
 
+//Servo
 
    valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, USMIN, USMAX);
+    Serial.print("DataToReceive.JoyStk2VertValue:");
+    Serial.println(DataToReceive.JoyStk2VertValue);
+    Serial.print("DataToReceive.JoyStk2hor:");
+    Serial.println(DataToReceive.JoyStk2HorValue);
    //pwm.writeMicroseconds(0,valuePWM);
    //pwm.setPWM(servonum_0,0,valuePWM);//***
    //valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, SERVOMIN, SERVOMAX);
@@ -381,10 +402,29 @@ void ReadKey(void)
    pwm.writeMicroseconds(servonum_0,valuePWM);//***
    //valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, 0, 180);
    pwm.writeMicroseconds(servonum_1,valuePWM);//***
-   Serial.println(DataToReceive.JoyStk1HorValue);
+   //Serial.println(DataToReceive.JoyStk1HorValue);
    Serial.println(valuePWM);
    
+// fin servo
 
+// ESC pompe
+if (DataToReceive.ESCpump == 1)
+{
+  //valESC = 1300;
+  Serial.print("pump : ");
+  Serial.println(DataToReceive.ESCpump);
+  Serial.println(ESCON);
+   pwm.writeMicroseconds(ESC,ESCON);//***
+}else
+{
+  //valESC = 1000;
+   Serial.print("pump : ");
+  Serial.println(DataToReceive.ESCpump);
+  pwm.writeMicroseconds(ESC,ESCOFF);
+}
+
+ // fin ESC pompe 
+   
   
   // if (DataToReceive.JoyStk2VertValue >= 580){
   //     Serial.println("PWM sens 2");
