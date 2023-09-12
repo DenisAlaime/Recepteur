@@ -76,7 +76,7 @@ unsigned int global_counter=0;//permet de générer des tempo dans la routine d'
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 #define ESCOFF     1000
-#define ESCON       1200
+#define ESCON      1400
 
 #define tunnel "PIPE1"
 
@@ -91,10 +91,10 @@ char StatLED=0;
 
 
 #define servonum_0 0  //**** Servo-Levage connecté à la PIN LED0 soit n°0 (il faut mettre un nombre entre 0 et 15 et sur l'extender, on a LED0-LED15)
-#define servonum_1 1
-#define servonum_2 2
-#define servonum_3 3
-#define servonum_4 4
+#define servonum_1 1  // servo godet
+#define servonum_2 2  // servo direction
+#define servonum_3 3  // servo PO
+#define servonum_4 4  // servo aux
 #define ESC 5
 
 //moteur
@@ -136,7 +136,7 @@ void setup()
     pStateFunc = NULL;  
   //Je pense ces lignes inutiles pour le Bull
   // Initialisation du port série (pour afficher les infos reçues, sur le "Moniteur Série" de l'IDE Arduino)
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Récepteur NRF24");
   Serial.println("");
   pinMode(13, OUTPUT);
@@ -166,7 +166,7 @@ void setup()
   
   //radio.setChannel(0);
   
-  radio.setPALevel(RF24_PA_MIN); // Sélection d'un niveau "MINIMAL" pour communiquer (pas besoin d'une forte puissance, pour nos essais)
+  radio.setPALevel(RF24_PA_MAX); // Sélection d'un niveau "MINIMAL" pour communiquer (pas besoin d'une forte puissance, pour nos essais)
   radio.setDataRate(RF24_250KBPS);
   radio.startListening(); // Démarrage de l'écoute du NRF24 (signifiant qu'on va recevoir, et non émettre quoi que ce soit, ici)
   
@@ -342,6 +342,10 @@ void ReadKey(void)
 {
    static char enter = 1;
    uint16_t valuePWM;
+   uint16_t valuePWM1;
+   uint16_t valuePWM2;
+   uint16_t valuePWM3;
+   uint16_t valuePWM4;
    //int valESC;
 
     if (enter)
@@ -390,7 +394,7 @@ void ReadKey(void)
 
 //Servo
 
-   valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, USMIN, USMAX);
+   //valuePWM = map(DataToReceive.JoyStk2VertValue, 0, 1023, USMIN, USMAX);
     Serial.print("DataToReceive.JoyStk2VertValue:");
     Serial.println(DataToReceive.JoyStk2VertValue);
     Serial.print("DataToReceive.JoyStk2hor:");
@@ -398,10 +402,21 @@ void ReadKey(void)
    //pwm.writeMicroseconds(0,valuePWM);
    //pwm.setPWM(servonum_0,0,valuePWM);//***
    //valuePWM = map(DataToReceive.JoyStk2HorValue, 0, 1023, SERVOMIN, SERVOMAX);
-   valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, USMIN, USMAX);
-   pwm.writeMicroseconds(servonum_0,valuePWM);//***
+   
+   // Servo direction K3
+   valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, USMAX, USMIN);
+   pwm.writeMicroseconds(servonum_2,valuePWM);//***
    //valuePWM = map(DataToReceive.JoyStk1HorValue, 0, 1023, 0, 180);
-   pwm.writeMicroseconds(servonum_1,valuePWM);//***
+
+   // Servo levage K1
+   valuePWM1 = map(DataToReceive.JoyStk2VertValue, 0, 1023, USMIN, USMAX);
+   pwm.writeMicroseconds(servonum_0,valuePWM1);//***
+
+   // Servo godet K2
+   valuePWM2 = map(DataToReceive.JoyStk2HorValue, 0, 1023, USMIN, USMAX);
+   pwm.writeMicroseconds(servonum_1,valuePWM2);//***
+
+   //Servo
    //Serial.println(DataToReceive.JoyStk1HorValue);
    Serial.println(valuePWM);
    
@@ -410,11 +425,12 @@ void ReadKey(void)
 // ESC pompe
 if (DataToReceive.ESCpump == 1)
 {
-  //valESC = 1300;
-  Serial.print("pump : ");
-  Serial.println(DataToReceive.ESCpump);
-  Serial.println(ESCON);
-   pwm.writeMicroseconds(ESC,ESCON);//***
+  
+valESC = (abs(DataToReceive.JoyStk1HorValue-511) + abs(DataToReceive.JoyStk2HorValue-511) + abs (DataToReceive.JoyStk2VertValue-511));
+valESC = min(valESC,400);
+valESC = (ESCOFF + valESC);
+pwm.writeMicroseconds(ESC,valESC);
+
 }else
 {
   //valESC = 1000;
@@ -424,7 +440,7 @@ if (DataToReceive.ESCpump == 1)
 }
 
  // fin ESC pompe 
-   
+
   
   // if (DataToReceive.JoyStk2VertValue >= 580){
   //     Serial.println("PWM sens 2");
